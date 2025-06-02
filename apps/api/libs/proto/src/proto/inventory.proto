@@ -1,0 +1,75 @@
+//apps/api/libs/proto/src/proto/inventory.proto
+syntax = "proto3";
+
+package api.inventory;
+
+import "google/protobuf/timestamp.proto";
+
+service InventoryService {
+  rpc GetItemsByUserId(GetItemsRequest) returns (GetItemsResponse);
+  rpc GetAllItems(GetAllItemsRequest) returns (GetItemsResponse);
+  rpc GetItemDetails(GetItemDetailsRequest) returns (ItemDetails);
+  rpc CreateItem(CreateItemRequest) returns (Item);
+  rpc UpdateItem(UpdateItemRequest) returns (Item);
+  rpc DeleteItem(GetItemDetailsRequest) returns (Item);
+}
+
+message User {
+  string id = 1;
+  string email = 2;
+  string username = 3;
+}
+
+message Item {
+  string id = 1;
+  string name = 2;
+  string category = 3;
+  int32 quantity = 4;
+  string condition = 5; // e.g., New, Good, Worn
+  string photoUrl = 6;
+  bool isAvailable = 7;
+  google.protobuf.Timestamp createdAt = 8;
+  google.protobuf.Timestamp updatedAt = 9;
+  string userId = 10;
+}
+
+message GetItemsRequest {
+  User user = 1;
+}
+
+message GetAllItemsRequest {
+  // Empty request
+}
+
+message GetItemsResponse {
+  repeated Item items = 1;
+}
+
+message GetItemDetailsRequest {
+  User user = 1;
+  string itemId = 2;
+}
+
+message ItemDetails {
+  Item item = 1;
+}
+
+message CreateItemRequest {
+  User user = 1;
+  CreateItemDto item = 2;
+}
+
+message UpdateItemRequest {
+  User user = 1;
+  string itemId = 2;
+  CreateItemDto item = 3;
+}
+
+message CreateItemDto {
+  string name = 1;
+  string category = 2;
+  int32 quantity = 3;
+  string condition = 4;
+  string photoUrl = 5;
+  bool isAvailable = 6;
+}

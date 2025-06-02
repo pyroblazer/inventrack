@@ -1,0 +1,26 @@
+{
+  "extends": "@shared/typescript-config/nextjs.json",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@shared/*": ["../../packages/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "next.config.mjs",
+    "postcss.config.mjs",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "../../next.config.ts",
+    "src/app/dashboard/staff/page.tsx"
+    // "../../_temp/dashboard/admin/page.tsx"
+  ],
+  "exclude": ["node_modules"]
+}

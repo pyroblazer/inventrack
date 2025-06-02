@@ -1,0 +1,78 @@
+// apps/api/libs/proto/src/proto/booking.proto
+syntax = "proto3";
+
+package api.booking;
+
+import "google/protobuf/timestamp.proto";
+
+service BookingService {
+  rpc GetBookingsByUserId(GetBookingsRequest) returns (GetBookingsResponse);
+  rpc GetAllBookings(GetAllBookingsRequest) returns (GetBookingsResponse); // Added for admin
+  rpc GetBookingDetails(GetBookingDetailsRequest) returns (BookingDetails);
+  rpc CreateBooking(CreateBookingRequest) returns (Booking);
+  rpc UpdateBooking(UpdateBookingRequest) returns (Booking);
+  rpc DeleteBooking(DeleteBookingRequest) returns (Booking);
+}
+
+message User {
+  string id = 1;
+  string email = 2;
+  string username = 3;
+}
+
+message Booking {
+  string id = 1;
+  string itemId = 2;
+  string userId = 3;
+  google.protobuf.Timestamp startTime = 4;
+  google.protobuf.Timestamp endTime = 5;
+  string note = 6;
+  string status = 7; // e.g., Pending, Approved, Cancelled
+  google.protobuf.Timestamp createdAt = 8;
+  google.protobuf.Timestamp updatedAt = 9;
+}
+
+message GetBookingsRequest {
+  User user = 1;
+}
+
+message GetAllBookingsRequest {
+  User user = 1;
+}
+
+message GetBookingsResponse {
+  repeated Booking bookings = 1;
+}
+
+message GetBookingDetailsRequest {
+  User user = 1;
+  string bookingId = 2;
+}
+
+message BookingDetails {
+  Booking booking = 1;
+}
+
+message CreateBookingRequest {
+  User user = 1;
+  CreateBookingDto booking = 2;
+}
+
+message UpdateBookingRequest {
+  User user = 1;
+  string bookingId = 2;
+  CreateBookingDto booking = 3;
+}
+
+message DeleteBookingRequest {
+  User user = 1;
+  string bookingId = 2;
+}
+
+message CreateBookingDto {
+  string itemId = 1;
+  string startTime = 2;
+  string endTime = 3;
+  string note = 4;
+  string status = 5;
+}

@@ -1,0 +1,11 @@
+{
+  "extends": "@shared/typescript-config/nextjs.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@shared/ui/*": ["./src/*"]
+    }
+  },
+  "include": ["src", "."],
+  "exclude": ["dist", "build", "node_modules"]
+}
