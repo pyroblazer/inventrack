@@ -1,0 +1,32 @@
+{
+  "name": "docs",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack --port 3004",
+    "clean": "rimraf dist node_modules .turbo .next",
+    "build": "next build",
+    "build:frontend": "next build",
+    "start": "next start --port 3004",
+    "start:frontend": "next start --port 3004",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "type-check": "tsc --noEmit",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@shared/ui": "workspace:*",
+    "next": "^15.1.6",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@shared/eslint-config": "workspace:*",
+    "@shared/typescript-config": "workspace:*",
+    "@types/node": "^22.15.29",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.5",
+    "eslint": "^9.28.0",
+    "typescript": "^5.8.3"
+  }
+}

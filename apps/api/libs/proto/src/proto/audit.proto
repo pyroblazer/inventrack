@@ -1,0 +1,63 @@
+// packages/proto/src/audit.proto
+syntax = "proto3";
+
+package api.audit;
+
+import "google/protobuf/timestamp.proto";
+
+message RecordActionRequest {
+  string userId = 1;
+  string action = 2;
+  string entityType = 3;
+  string entityId = 4;
+  optional string details = 5;
+  optional string metadata = 6; // JSON string
+  optional google.protobuf.Timestamp createdAt = 7;
+}
+
+message RecordActionResponse {
+  string id = 1;
+}
+
+message GetLogsByUserRequest {
+  string userId = 1;
+  optional int32 limit = 2;
+  optional int32 offset = 3;
+}
+
+message GetLogsByUserResponse {
+  repeated AuditLogEntry logs = 1;
+  int32 total = 2;
+}
+
+message GetAllLogsRequest {
+  optional int32 limit = 1;
+  optional int32 offset = 2;
+  optional string action = 3;
+  optional string entityType = 4;
+  optional string userId = 5;
+  optional google.protobuf.Timestamp startDate = 6;
+  optional google.protobuf.Timestamp endDate = 7;
+}
+
+message GetAllLogsResponse {
+  repeated AuditLogEntry logs = 1;
+  int32 total = 2;
+}
+
+message AuditLogEntry {
+  string id = 1;
+  string userId = 2;
+  string action = 3;
+  string entityType = 4;
+  string entityId = 5;
+  optional string details = 6;
+  optional string metadata = 7; // JSON string
+  google.protobuf.Timestamp createdAt = 8;
+}
+
+service AuditService {
+  rpc recordAction(RecordActionRequest) returns (RecordActionResponse);
+  rpc getLogsByUser(GetLogsByUserRequest) returns (GetLogsByUserResponse);
+  rpc getAllLogs(GetAllLogsRequest) returns (GetAllLogsResponse);
+}

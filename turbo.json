@@ -1,0 +1,103 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "ui": "tui",
+  "cacheDir": ".turbo/cache",
+  "globalDependencies": ["**/.env"],
+  "globalEnv": [
+    "NEXT_PUBLIC_API_URL",
+    "NODE_ENV",
+    "REDIS_URL",
+    "REDIS_FULL_URL",
+    "REDIS_TOKEN",
+    "RATE_LIMIT_TTL",
+    "RATE_LIMIT_MAX_REQUESTS",
+    "RATE_LIMIT_STORAGE",
+    "ENCRYPTION_KEY",
+    "GOOGLE_GENERATIVE_AI_API_KEY",
+    "USERS_SERVICE_HOST",
+    "USERS_SERVICE_PORT",
+    "AUTH_SERVICE_HOST",
+    "AUTH_SERVICE_PORT",
+    "API_VERSION",
+    "SSL_KEY_PATH",
+    "SSL_CERT_PATH",
+    "CACHE_DISABLED",
+    "DOMAIN",
+    "COOKIE_DOMAIN"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "cache": true
+    },
+    "build:frontend": {
+      "dependsOn": ["^build:frontend"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "!.next/cache/**"],
+      "cache": true
+    },
+    "build:frontend-shared": {
+      "dependsOn": ["^build:frontend"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "!.next/cache/**"],
+      "cache": true
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "check-types": {
+      "dependsOn": ["^check-types"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "clean": {
+      "cache": false
+    },
+    "clean:microservices": {
+      "cache": false
+    },
+    "test": {
+      "cache": false
+    },
+    "build:types": {
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["dist/**"],
+      "cache": true
+    },
+    "bootstrap": {
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["dist/**"],
+      "cache": true
+    },
+    "build:backend": {
+      "dependsOn": ["clean:microservices", "^build:backend"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["dist/**"],
+      "cache": true
+    },
+    "start": {
+      "dependsOn": ["^start"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"]
+    },
+    "start:frontend": {
+      "dependsOn": ["^start:frontend"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"]
+    },
+    "start:backend": {
+      "dependsOn": ["^start:backend"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"]
+    },
+    "start:prod": {
+      "dependsOn": ["^start:prod"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"]
+    },
+    "type-check": {
+      "cache": false,
+      "outputs": []
+    }
+  }
+}
