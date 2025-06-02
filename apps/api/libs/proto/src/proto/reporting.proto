@@ -1,0 +1,71 @@
+//apps/api/libs/proto/src/proto/reporting.proto
+syntax = "proto3";
+
+package api.reporting;
+
+service ReportingService {
+  rpc GetAdminDashboardData (DashboardRequest) returns (AdminDashboardResponse);
+  rpc GetStaffDashboardData (StaffDashboardRequest) returns (StaffDashboardResponse);
+  rpc ExportUsageLogs (ExportRequest) returns (ExportResponse);
+}
+
+message DashboardRequest {
+  string startDate = 1;
+  string endDate = 2;
+}
+
+message AdminDashboardResponse {
+  repeated TopItem items = 1;
+  repeated CategoryBookings categoryStats = 2;
+  repeated UsageTrend usageTrends = 3;
+  repeated OverdueReturn overdueReturns = 4;
+}
+
+message TopItem {
+  string itemId = 1;
+  string name = 2;
+  int32 bookingCount = 3;
+}
+
+message CategoryBookings {
+  string category = 1;
+  int32 totalBookings = 2;
+}
+
+message UsageTrend {
+  string date = 1;
+  int32 count = 2;
+}
+
+message OverdueReturn {
+  string bookingId = 1;
+  string itemId = 2;
+  string dueDate = 3;
+  string userId = 4;
+}
+
+message StaffDashboardRequest {
+  string userId = 1;
+}
+
+message StaffDashboardResponse {
+  repeated BookingHistory history = 1;
+}
+
+message BookingHistory {
+  string bookingId = 1;
+  string itemId = 2;
+  string status = 3;
+  string startDate = 4;
+  string endDate = 5;
+}
+
+message ExportRequest {
+  string format = 1; // csv, pdf
+  string rangeStart = 2;
+  string rangeEnd = 3;
+}
+
+message ExportResponse {
+  string downloadUrl = 1;
+}
