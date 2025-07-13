@@ -1,4 +1,4 @@
-//apps/web/src/actions/notification/notification-service.ts
+// apps/web/src/actions/notification/notification-service.ts
 import { ApiClient } from "@/lib/api-client";
 import { getErrorMessage } from "@/lib/get-error-message";
 import { type NotificationEndpoints } from "@shared/types";

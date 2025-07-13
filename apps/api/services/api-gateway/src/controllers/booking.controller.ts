@@ -147,7 +147,7 @@ export class BookingController implements OnModuleInit {
       };
 
       return await this.grpcClient.call<BookingProto.GetBookingsResponse>(
-        this.bookingService.getAllBookings(request), // Changed method name
+        this.bookingService.getAllBookings(request),
         'Booking.GetAllBookings',
       );
     } catch (error) {

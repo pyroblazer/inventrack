@@ -3,6 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { RedisService } from '@microservices/redis';
 import {
   eq,
+  desc,
   type NeonDatabaseType,
   notifications,
 } from '@microservices/database';
@@ -19,7 +20,7 @@ interface ProtoNotification {
   message: string;
   type: string;
   read: boolean;
-  created_at: string;
+  createdAt: string; // Consistent camelCase
 }
 
 @Injectable()
@@ -69,12 +70,14 @@ export class NotificationServiceImpl {
       message,
       type,
       read: false,
-      created_at: inserted.createdAt.toISOString(),
+      createdAt: inserted.createdAt.toISOString(), // Consistent camelCase
     };
 
+    // Publish to Redis for real-time notifications
     await this.redis
       .getClient()
       .publish(`notifications:${userId}`, JSON.stringify(protoNotification));
+
     return { success: true };
   }
 
@@ -84,14 +87,15 @@ export class NotificationServiceImpl {
     const rows = await this.database
       .select()
       .from(notifications)
-      .where(eq(notifications.userId, userId));
+      .where(eq(notifications.userId, userId))
+      .orderBy(desc(notifications.createdAt)); // Order by newest first
 
     const protoNotifications: ProtoNotification[] = rows.map((row) => {
       if (typeof row.content !== 'object' || row.content === null) {
         throw new Error('Invalid notification content');
       }
 
-      if (row.read === null) {
+      if (row.read === null || row.read === undefined) {
         throw new Error('Notification read status is null');
       }
 
@@ -105,8 +109,8 @@ export class NotificationServiceImpl {
         title: content.title,
         message: content.message,
         type: row.type,
-        read: row.read, // Now guaranteed to be boolean
-        created_at: row.createdAt.toISOString(), // Now guaranteed to exist
+        read: row.read,
+        createdAt: row.createdAt.toISOString(), // Consistent camelCase
       };
     });
 
@@ -114,13 +118,14 @@ export class NotificationServiceImpl {
   }
 
   async markAsRead(notificationId: string): Promise<{ success: boolean }> {
-    const result = await this.database
+    const [result] = await this.database
       .update(notifications)
       .set({ read: true })
-      .where(eq(notifications.id, notificationId));
+      .where(eq(notifications.id, notificationId))
+      .returning({ id: notifications.id });
 
     if (!result) {
-      throw new Error('Failed to update notification');
+      throw new Error('Notification not found or failed to update');
     }
 
     return { success: true };

@@ -37,3 +37,5 @@ export {
   count,
   SQL,
 } from "drizzle-orm"; // Export operators
+
+export * from "drizzle-orm/pg-core";

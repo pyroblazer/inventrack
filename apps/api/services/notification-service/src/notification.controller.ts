@@ -1,9 +1,10 @@
+// apps/api/services/notification-service/src/notification.controller.ts
 import { Controller, Logger } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { NotificationServiceImpl } from './notification.service';
 
 interface SendNotificationRequest {
-  user_id: string;
+  userId: string;
   title: string;
   message: string;
   type: string;
@@ -11,11 +12,11 @@ interface SendNotificationRequest {
 }
 
 interface GetUserNotificationsRequest {
-  user_id: string;
+  userId: string;
 }
 
-interface MarkAsReadRequest {
-  notification_id: string;
+interface MarkNotificationAsReadRequest {
+  notificationId: string;
 }
 
 interface NotificationResponse {
@@ -29,7 +30,7 @@ interface UserNotificationsResponse {
     message: string;
     type: string;
     read: boolean;
-    created_at: string;
+    createdAt: string; // Consistent camelCase
   }>;
 }
 
@@ -46,7 +47,7 @@ export class NotificationController {
     this.logger.log('SendNotification request:', request);
     try {
       if (
-        !request.user_id ||
+        !request.userId ||
         !request.title ||
         !request.message ||
         !request.type
@@ -55,7 +56,7 @@ export class NotificationController {
       }
 
       const result = await this.service.sendNotification(
-        request.user_id,
+        request.userId,
         request.title,
         request.message,
         request.type,
@@ -75,11 +76,11 @@ export class NotificationController {
   ): Promise<UserNotificationsResponse> {
     this.logger.log('GetUserNotifications request:', request);
     try {
-      if (!request.user_id) {
+      if (!request.userId) {
         throw new Error('User ID is required');
       }
 
-      const result = await this.service.getUserNotifications(request.user_id);
+      const result = await this.service.getUserNotifications(request.userId);
       this.logger.log(
         'GetUserNotifications response count:',
         result.notifications.length,
@@ -92,14 +93,16 @@ export class NotificationController {
   }
 
   @GrpcMethod('NotificationService', 'MarkNotificationAsRead')
-  async markAsRead(request: MarkAsReadRequest): Promise<NotificationResponse> {
+  async markNotificationAsRead(
+    request: MarkNotificationAsReadRequest,
+  ): Promise<NotificationResponse> {
     this.logger.log('MarkNotificationAsRead request:', request);
     try {
-      if (!request.notification_id) {
+      if (!request.notificationId) {
         throw new Error('Notification ID is required');
       }
 
-      const result = await this.service.markAsRead(request.notification_id);
+      const result = await this.service.markAsRead(request.notificationId);
       this.logger.log('MarkNotificationAsRead response:', result);
       return result;
     } catch (error) {

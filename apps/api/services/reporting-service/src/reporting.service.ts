@@ -23,6 +23,7 @@ import {
   asc,
 } from '@microservices/database';
 import { UTApi } from 'uploadthing/server';
+import { UploadedFileData, UploadFileResult } from 'uploadthing/types';
 
 interface TopItemQueryResult {
   itemId: string;
@@ -446,7 +447,9 @@ export class ReportingService {
       const fileBlob: Blob = new Blob([fileContent], { type: mimeType });
       const file: File = new File([fileBlob], fileName, { type: mimeType });
 
-      const uploadResult = await this.utapi.uploadFiles([file]);
+      const uploadResult: UploadFileResult[] = await this.utapi.uploadFiles([
+        file,
+      ]);
 
       if (!uploadResult[0] || uploadResult[0].error) {
         const errorMessage: string = 'Upload error';

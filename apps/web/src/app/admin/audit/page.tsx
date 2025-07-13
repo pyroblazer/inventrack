@@ -40,7 +40,7 @@ export default function AuditLogsPage() {
   const [dateFilter, setDateFilter] = useState<string>("all");
 
   useEffect(() => {
-    if (currentUser?.role === "admin") {
+    if (currentUser?.role === "ADMIN") {
       loadAuditLogs();
     }
   }, [currentUser]);
@@ -132,7 +132,7 @@ export default function AuditLogsPage() {
     return "bg-gray-100 text-gray-800";
   };
 
-  if (currentUser?.role !== "admin") {
+  if (currentUser?.role !== "ADMIN") {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Card className="w-96">

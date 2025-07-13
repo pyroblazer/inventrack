@@ -5,11 +5,17 @@ import {
   Calendar,
   Users,
   FileText,
+  Search,
+  UserCheck,
+  ToggleLeft,
 } from "lucide-react";
 import type { NavMainType } from "@shared/types";
 
 /**
  * Get sidebar options based on user role
+ * Features implemented:
+ * - Feature 1b: Role-based navigation (Admin vs Staff)
+ * - Bonus: Admin/Staff mode switcher for admin users
  */
 export const getSidebarOptions = (
   userRole?: string,
@@ -17,7 +23,7 @@ export const getSidebarOptions = (
   const commonItems: NavMainType[] = [
     {
       title: "Dashboard",
-      url: userRole === "admin" ? "/dashboard/admin" : "/dashboard/staff",
+      url: userRole === "ADMIN" ? "/dashboard/admin" : "/dashboard/staff",
       icon: AirplayIcon,
       isActive: false,
     },
@@ -25,20 +31,14 @@ export const getSidebarOptions = (
 
   const staffItems: NavMainType[] = [
     {
-      title: "Browse Items",
+      title: "Browse Items", // Feature 3a: View available items by category
       url: "/browse",
-      icon: Package,
+      icon: Search,
       isActive: false,
     },
     {
-      title: "My Bookings",
+      title: "My Bookings", // Feature 3b,d,e & 4f,g,h: Book items, return items, view history
       url: "/bookings",
-      icon: Calendar,
-      isActive: false,
-    },
-    {
-      title: "Calendar View",
-      url: "/bookings/calendar",
       icon: Calendar,
       isActive: false,
     },
@@ -46,39 +46,41 @@ export const getSidebarOptions = (
 
   const adminItems: NavMainType[] = [
     {
-      title: "Inventory",
+      title: "Inventory", // Feature 2: Inventory Management (Admin only)
       url: "/inventory",
       icon: Package,
       isActive: false,
     },
     {
-      title: "Manage Bookings",
+      title: "Manage Bookings", // Feature 3e: Admin booking management
       url: "/admin/bookings",
-      icon: Calendar,
+      icon: UserCheck,
       isActive: false,
     },
     {
-      title: "User Management",
+      title: "User Management", // Feature 1c: Admin manage users
       url: "/admin/users",
       icon: Users,
       isActive: false,
     },
     {
-      title: "Analytics",
+      title: "Analytics", // Feature 4a,b,c,d,e: Admin Dashboard metrics
       url: "/analytics-dashboard",
       icon: ChartAreaIcon,
       isActive: false,
     },
     {
-      title: "Audit Logs",
+      title: "Audit Logs", // Feature 1d & 6c: Admin view logs & audit trail
       url: "/admin/audit",
       icon: FileText,
       isActive: false,
     },
   ];
 
-  if (userRole === "admin") {
-    return { navMain: [...commonItems, ...staffItems, ...adminItems] };
+  if (userRole === "ADMIN") {
+    return {
+      navMain: [...commonItems, ...staffItems, ...adminItems],
+    };
   } else {
     return { navMain: [...commonItems, ...staffItems] };
   }

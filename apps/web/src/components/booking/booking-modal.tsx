@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { Package, Clock } from "lucide-react";
 import type { InventoryItem } from "@shared/types";
 import { format, addDays } from "date-fns";
+import { sendNotification } from "@/actions/notification/server-actions";
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -63,6 +64,19 @@ export function BookingModal({ isOpen, onClose, item }: BookingModalProps) {
         note: formData.note,
         status: "pending",
       });
+
+      // Feature 5b: Notify admin of new booking request
+      try {
+        await sendNotification({
+          userId: "admin", // You might need to get actual admin user IDs
+          title: "New Booking Request",
+          message: `A new booking request has been submitted for item ${item.name} by user ${user.email || user.id}`,
+          type: "booking_request",
+        });
+      } catch (notificationError) {
+        console.error("Failed to send admin notification:", notificationError);
+        // Don't fail the booking if notification fails
+      }
 
       toast.success("Booking request submitted successfully");
       onClose();

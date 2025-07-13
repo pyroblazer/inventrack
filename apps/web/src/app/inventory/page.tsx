@@ -47,6 +47,7 @@ import {
 } from "@shared/ui/components/ui/alert-dialog";
 
 export default function InventoryPage() {
+  // Feature 2: Inventory Management (Admin only)
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [filteredItems, setFilteredItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,6 +81,7 @@ export default function InventoryPage() {
     }
   };
 
+  // Feature 3a: View available items by category (filtering)
   const filterItems = () => {
     let filtered = items;
 
@@ -107,11 +109,13 @@ export default function InventoryPage() {
     setFilteredItems(filtered);
   };
 
+  // Feature 2a: Add/edit/delete items
   const handleEdit = (item: InventoryItem) => {
     setEditingItem(item);
     setIsModalOpen(true);
   };
 
+  // Feature 2a: Add/edit/delete items
   const handleDelete = async (item: InventoryItem) => {
     try {
       await deleteInventoryItem(item.id);
@@ -130,6 +134,7 @@ export default function InventoryPage() {
     loadItems();
   };
 
+  // Feature 2b: Item details - condition display
   const getConditionColor = (condition?: string) => {
     switch (condition?.toLowerCase()) {
       case "new":
@@ -147,6 +152,7 @@ export default function InventoryPage() {
     ...new Set(items.map((item) => item.category).filter(Boolean)),
   ];
 
+  // Feature 6b: Export usage logs (CSV export)
   const exportData = () => {
     const csv = [
       ["Name", "Category", "Quantity", "Condition", "Available", "Created At"],
@@ -181,6 +187,7 @@ export default function InventoryPage() {
 
   return (
     <div className="space-y-6 p-6">
+      {/* Feature 2: Inventory Management - Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Inventory Management</h1>
@@ -189,14 +196,17 @@ export default function InventoryPage() {
           </p>
         </div>
         <div className="flex gap-2">
+          {/* Feature 6b: Export usage logs */}
           <Button variant="outline" onClick={exportData}>
             <Download className="h-4 w-4 mr-2" />
             Export CSV
           </Button>
+          {/* Feature 6a: Bulk item upload (CSV) */}
           <Button variant="outline" onClick={() => setIsBulkUploadOpen(true)}>
             <Upload className="h-4 w-4 mr-2" />
             Bulk Upload
           </Button>
+          {/* Feature 2a: Add/edit/delete items */}
           <Button onClick={() => setIsModalOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Add Item
@@ -204,7 +214,7 @@ export default function InventoryPage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Feature 2: Inventory Management - Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -248,7 +258,7 @@ export default function InventoryPage() {
         </Card>
       </div>
 
-      {/* Filters */}
+      {/* Feature 3a: View available items by category - Filters */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-4">
@@ -304,11 +314,12 @@ export default function InventoryPage() {
         </CardContent>
       </Card>
 
-      {/* Items Grid */}
+      {/* Feature 2b: Item details - Items Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredItems.map((item) => (
           <Card key={item.id} className="overflow-hidden">
             <div className="aspect-square bg-muted relative">
+              {/* Feature 2b: Item details - photo upload */}
               {item.photoUrl ? (
                 <img
                   src={item.photoUrl || "/placeholder.svg"}
@@ -321,6 +332,7 @@ export default function InventoryPage() {
                 </div>
               )}
               <div className="absolute top-2 right-2">
+                {/* Feature 2b: Item details - availability toggle */}
                 <Badge variant={item.isAvailable ? "default" : "secondary"}>
                   {item.isAvailable ? "Available" : "Unavailable"}
                 </Badge>
@@ -328,6 +340,7 @@ export default function InventoryPage() {
             </div>
             <CardContent className="p-4">
               <div className="space-y-2">
+                {/* Feature 2b: Item details - name, category, quantity, condition */}
                 <h3 className="font-semibold truncate">{item.name}</h3>
                 {item.category && (
                   <p className="text-sm text-muted-foreground">
@@ -342,6 +355,7 @@ export default function InventoryPage() {
                     </Badge>
                   )}
                 </div>
+                {/* Feature 2a: Add/edit/delete items - Action buttons */}
                 <div className="flex gap-2 pt-2">
                   <Button
                     variant="outline"
@@ -393,20 +407,21 @@ export default function InventoryPage() {
         </Card>
       )}
 
-      {/* Modals */}
+      {/* Feature 2a: Add/edit/delete items - Modals */}
       <InventoryItemModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
         item={editingItem}
       />
 
+      {/* Feature 6a: Bulk item upload (CSV) */}
       <BulkUploadModal
         isOpen={isBulkUploadOpen}
         onClose={() => setIsBulkUploadOpen(false)}
         onSuccess={loadItems}
       />
 
-      {/* Delete Confirmation */}
+      {/* Feature 2a: Add/edit/delete items - Delete Confirmation */}
       <AlertDialog open={!!deleteItem} onOpenChange={() => setDeleteItem(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

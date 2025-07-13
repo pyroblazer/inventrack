@@ -1,16 +1,9 @@
-//apps/web/src/components/sidebar/sidebar-footer-content.tsx
 "use client";
 
-import { useCurrentUser } from "@/hooks/use-current-user";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@shared/ui/components/ui/avatar";
+import { ChevronsUpDown, LogOut } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -22,133 +15,80 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@shared/ui/components/ui/sidebar";
-import { Skeleton } from "@shared/ui/components/ui/skeleton";
-import {
-  BadgeCheck,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { Avatar, AvatarFallback } from "@shared/ui/components/ui/avatar";
+import { useCurrentUser } from "@/hooks/use-current-user";
 import { logoutUser } from "@shared/ui/actions/auth/logout-user";
-import type { JSX } from "react";
-import { Separator } from "@shared/ui/components/ui/separator";
-import { useQueryClient } from "@tanstack/react-query";
+import { NotificationCenter } from "@/components/notifications/notification-center";
 
-/**
- * SidebarFooterContent component renders the footer content of the sidebar
- * @returns {JSX.Element} Rendered sidebar footer content
- */
-export function SidebarFooterContent(): JSX.Element {
-  const router = useRouter();
-  const queryClient = useQueryClient();
+export function SidebarFooterContent() {
   const { isMobile } = useSidebar();
-  const { user, isLoading } = useCurrentUser();
+  const { user } = useCurrentUser();
 
-  async function handleUserLogout(): Promise<void> {
-    try {
-      await logoutUser();
+  const handleLogout = async () => {
+    await logoutUser();
+    window.location.href = "/sign-in";
+  };
 
-      // Clear all queries from cache
-      queryClient.clear();
-
-      // Specifically invalidate user query
-      await queryClient.invalidateQueries({ queryKey: ["user"] });
-
-      toast.success("You have been logged out.");
-
-      // Redirect to auth page
-      const authUrl = process.env.NEXT_PUBLIC_AUTH_APP_URL || "/sign-in";
-      window.location.href = authUrl;
-    } catch (error) {
-      console.error("Logout error:", error);
-      toast.error("Failed to logout. Please try again.");
-    }
-  }
-
-  if (isLoading || !user) {
-    return <Skeleton className="w-[180px] h-[40px] rounded-md" />;
+  if (!user) {
+    return null;
   }
 
   return (
     <SidebarMenu>
-      <Separator className="my-2" />
-
       <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground transition-colors"
-              size="lg"
-            >
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage
-                  alt={user.username ?? "User"}
-                  src={user.avatar ?? "https://github.com/shadcn.png"}
-                />
-                <AvatarFallback className="rounded-lg">
-                  {user.username?.slice(0, 2) ?? "U"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.username}</span>
-                <span className="truncate text-xs">{user.email}</span>
-              </div>
-              <ChevronsUpDown className="ml-auto size-4" />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+        <div className="flex items-center justify-between w-full p-2">
+          {/* Feature 5a,b: Notifications - Notification center in sidebar */}
+          <NotificationCenter />
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <SidebarMenuButton
+                size="lg"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              >
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage
-                    alt={user.username ?? "User"}
-                    src={user.avatar ?? "https://github.com/shadcn.png"}
-                  />
                   <AvatarFallback className="rounded-lg">
-                    {user.username?.slice(0, 2) ?? "U"}
+                    {(user.username || user.email).charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">
-                    {user.username}
+                    {user.username || user.email}
                   </span>
                   <span className="truncate text-xs">{user.email}</span>
                 </div>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => router.push("/upgrade")}>
-                <Sparkles className="mr-2" />
-                Upgrade to Pro
+                <ChevronsUpDown className="ml-auto size-4" />
+              </SidebarMenuButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+              side={isMobile ? "bottom" : "right"}
+              align="end"
+              sideOffset={4}
+            >
+              <DropdownMenuLabel className="p-0 font-normal">
+                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarFallback className="rounded-lg">
+                      {(user.username || user.email).charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">
+                      {user.username || user.email}
+                    </span>
+                    <span className="truncate text-xs">{user.email}</span>
+                  </div>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut />
+                Log out
               </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => router.push("/account")}>
-                <BadgeCheck className="mr-2" />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push("/billing")}>
-                <CreditCard className="mr-2" />
-                Billing
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleUserLogout}>
-              <LogOut className="mr-2" />
-              Log out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </SidebarMenuItem>
     </SidebarMenu>
   );

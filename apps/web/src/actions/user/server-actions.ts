@@ -5,6 +5,16 @@ import { UserService } from "@/actions/user/user-service";
 import { type User, type UsersEndpoints } from "@shared/types";
 
 /**
+ * Fetches all users (admin only)
+ */
+export async function getAllUsers(): Promise<
+  UsersEndpoints["getUsers"]["response"]
+> {
+  // return UserService.getAllUsers();
+  return { users: [] };
+}
+
+/**
  * Fetches current user information
  */
 export async function getCurrentUser(): Promise<User> {

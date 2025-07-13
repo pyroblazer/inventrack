@@ -1,7 +1,6 @@
 // packages/types/src/api-client/booking-endpoints.ts
 // @shared/types
 import type { ProtoTimestamp } from "../others/proto-timestamp";
-import { User } from "./users-endpoints";
 
 export interface Booking {
   id: string;
@@ -13,6 +12,10 @@ export interface Booking {
   status: string; // e.g., pending, approved, rejected, cancelled
   createdAt?: Date;
   updatedAt?: Date;
+  // Added display names
+  itemName?: string;
+  userName?: string;
+  userEmail?: string;
 }
 
 export interface BookingResponse {
@@ -25,6 +28,10 @@ export interface BookingResponse {
   status: string; // e.g., pending, approved, rejected, cancelled
   createdAt?: ProtoTimestamp;
   updatedAt?: ProtoTimestamp;
+  // Added display names
+  itemName?: string;
+  userName?: string;
+  userEmail?: string;
 }
 
 export interface CreateBookingDto {

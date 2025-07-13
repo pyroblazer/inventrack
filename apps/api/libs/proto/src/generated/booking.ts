@@ -34,6 +34,10 @@ export interface Booking {
   status: string;
   createdAt?: Timestamp | undefined;
   updatedAt?: Timestamp | undefined;
+  /** Added fields for display names */
+  itemName: string;
+  userName: string;
+  userEmail: string;
 }
 
 export interface GetBookingsRequest {
@@ -167,6 +171,9 @@ function createBaseBooking(): Booking {
     userId: "",
     note: "",
     status: "",
+    itemName: "",
+    userName: "",
+    userEmail: "",
   };
 }
 
@@ -203,6 +210,15 @@ export const Booking: MessageFns<Booking, "api.booking.Booking"> = {
     }
     if (message.updatedAt !== undefined) {
       Timestamp.encode(message.updatedAt, writer.uint32(74).fork()).join();
+    }
+    if (message.itemName !== "") {
+      writer.uint32(82).string(message.itemName);
+    }
+    if (message.userName !== "") {
+      writer.uint32(90).string(message.userName);
+    }
+    if (message.userEmail !== "") {
+      writer.uint32(98).string(message.userEmail);
     }
     return writer;
   },
@@ -285,6 +301,30 @@ export const Booking: MessageFns<Booking, "api.booking.Booking"> = {
           }
 
           message.updatedAt = Timestamp.decode(reader, reader.uint32());
+          continue;
+        }
+        case 10: {
+          if (tag !== 82) {
+            break;
+          }
+
+          message.itemName = reader.string();
+          continue;
+        }
+        case 11: {
+          if (tag !== 90) {
+            break;
+          }
+
+          message.userName = reader.string();
+          continue;
+        }
+        case 12: {
+          if (tag !== 98) {
+            break;
+          }
+
+          message.userEmail = reader.string();
           continue;
         }
       }

@@ -10,7 +10,7 @@ service NotificationService {
 }
 
 message SendNotificationRequest {
-  string user_id = 1;
+  string userId = 1;
   string title = 2;
   string message = 3;
   string type = 4; // e.g., BOOKING_APPROVED, ITEM_DUE, ITEM_RETURNED
@@ -22,7 +22,7 @@ message SendNotificationResponse {
 }
 
 message GetUserNotificationsRequest {
-  string user_id = 1;
+  string userId = 1;
 }
 
 message GetUserNotificationsResponse {
@@ -30,7 +30,7 @@ message GetUserNotificationsResponse {
 }
 
 message MarkNotificationAsReadRequest {
-  string notification_id = 1;
+  string notificationId = 1;
 }
 
 message MarkNotificationAsReadResponse {
@@ -43,5 +43,5 @@ message Notification {
   string message = 3;
   string type = 4;
   bool read = 5;
-  string created_at = 6;
+  string createdAt = 6;
 }

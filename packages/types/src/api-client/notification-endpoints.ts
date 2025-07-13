@@ -1,18 +1,17 @@
 // packages/types/src/api-client/notification-endpoints.ts
-
 export interface Notification {
   id: string;
   title: string;
   message: string;
   type: string;
   read: boolean;
-  created_at: string;
+  createdAt: string;
 }
 
 export interface NotificationEndpoints {
   sendNotification: {
     body: {
-      user_id: string;
+      userId: string;
       title: string;
       message: string;
       type: string;

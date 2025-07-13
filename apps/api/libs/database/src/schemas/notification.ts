@@ -14,7 +14,7 @@ export const notifications = pgTable("notifications", {
   type: text("type").notNull(), // e.g., 'email', 'sms'
   content: jsonb("content").notNull(),
   status: text("status").notNull(), // e.g., 'pending', 'sent', 'failed'
-  read: boolean("read").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
+  read: boolean("read").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
   sentAt: timestamp("sent_at"),
 });

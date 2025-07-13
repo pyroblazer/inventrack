@@ -6,7 +6,7 @@ async function seedInventoryItems() {
   await db.insert(inventoryItems).values([
     {
       id: nanoid(),
-      userId: "hu9ry02wmyn8tehb0n9m4xvs",
+      userId: "dt1ofx4966hax9hp0l46rnw8",
       name: "Projector Epson X123",
       category: "Electronics",
       quantity: 3,
@@ -16,7 +16,7 @@ async function seedInventoryItems() {
     },
     {
       id: nanoid(),
-      userId: "dvtjeju7c82775al7c9gq6m2",
+      userId: "dt1ofx4966hax9hp0l46rnw8",
       name: "Laptop Lenovo ThinkPad",
       category: "Computers",
       quantity: 5,
@@ -26,7 +26,7 @@ async function seedInventoryItems() {
     },
     {
       id: nanoid(),
-      userId: "hu9ry02wmyn8tehb0n9m4xvs",
+      userId: "dt1ofx4966hax9hp0l46rnw8",
       name: "Wireless Microphone Set",
       category: "Audio Equipment",
       quantity: 2,

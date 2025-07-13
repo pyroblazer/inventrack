@@ -1,3 +1,4 @@
+//apps/api/services/booking-service/src/booking.controller.ts
 import { Controller, Logger } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { BookingService } from './booking.service';
@@ -22,6 +23,43 @@ export class BookingController {
       return response;
     } catch (error) {
       this.logger.error('GetBookingsByUserId error:', error);
+      throw error;
+    }
+  }
+
+  @GrpcMethod('BookingService', 'GetAllBookings')
+  async getAllBookings(
+    request: BookingProto.GetAllBookingsRequest,
+  ): Promise<BookingProto.GetBookingsResponse> {
+    this.logger.log('GetAllBookings request received:', request);
+    try {
+      const response = await this.bookingService.getAllBookings(request);
+      this.logger.log('GetAllBookings response:', {
+        count: response.bookings.length,
+      });
+      return response;
+    } catch (error) {
+      this.logger.error('GetAllBookings error:', error);
+      throw error;
+    }
+  }
+
+  @GrpcMethod('BookingService', 'GetBookingDetails')
+  async getBookingDetails(
+    request: BookingProto.GetBookingDetailsRequest,
+  ): Promise<BookingProto.BookingDetails> {
+    this.logger.log('GetBookingDetails request received:', {
+      bookingId: request.bookingId,
+      userId: request.user?.id,
+    });
+    try {
+      const response = await this.bookingService.getBookingDetails(request);
+      this.logger.log('GetBookingDetails response:', {
+        bookingId: response.booking?.id,
+      });
+      return response;
+    } catch (error) {
+      this.logger.error('GetBookingDetails error:', error);
       throw error;
     }
   }
@@ -57,6 +95,24 @@ export class BookingController {
       return updated;
     } catch (error) {
       this.logger.error('UpdateBooking error:', error);
+      throw error;
+    }
+  }
+
+  @GrpcMethod('BookingService', 'DeleteBooking')
+  async deleteBooking(
+    request: BookingProto.DeleteBookingRequest,
+  ): Promise<BookingProto.Booking> {
+    this.logger.log('DeleteBooking request received:', {
+      bookingId: request.bookingId,
+      userId: request.user?.id,
+    });
+    try {
+      const deleted = await this.bookingService.deleteBooking(request);
+      this.logger.log('DeleteBooking response:', { bookingId: deleted.id });
+      return deleted;
+    } catch (error) {
+      this.logger.error('DeleteBooking error:', error);
       throw error;
     }
   }

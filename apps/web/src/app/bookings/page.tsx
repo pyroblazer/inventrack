@@ -1,3 +1,4 @@
+//apps/web/src/app/bookings/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -30,6 +31,7 @@ import {
 } from "@shared/ui/components/ui/select";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { Skeleton } from "@shared/ui/src/components/ui/skeleton";
+import { sendNotification } from "@/actions/notification/server-actions";
 
 // Helper function to convert ProtoTimestamp to Date
 const protoTimestampToDate = (timestamp?: ProtoTimestamp): Date => {
@@ -45,10 +47,6 @@ export default function BookingsPage() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("all");
   const { user, isLoading } = useCurrentUser();
-
-  if (isLoading || !user) {
-    return <Skeleton className="w-[180px] h-[40px] rounded-md" />;
-  }
 
   useEffect(() => {
     loadBookings();
@@ -162,222 +160,247 @@ export default function BookingsPage() {
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">My Bookings</h1>
-          <p className="text-muted-foreground">
-            Track your equipment reservations
-          </p>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending</CardTitle>
-            <Clock className="h-4 w-4 text-yellow-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">
-              {stats.pending}
+      {isLoading || !user ? (
+        <Skeleton className="w-[180px] h-[40px] rounded-md" />
+      ) : (
+        <>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold">My Bookings</h1>
+              <p className="text-muted-foreground">
+                Track your equipment reservations
+              </p>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {stats.approved}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Returned</CardTitle>
-            <Package className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
-              {stats.returned}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Overdue</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              {stats.overdue}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Filters */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-4">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Bookings</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
-                <SelectItem value="returned">Returned</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Bookings List */}
-      <div className="space-y-4">
-        {filteredBookings.map((booking) => (
-          <Card
-            key={booking.id}
-            className={`${isOverdue(booking) ? "border-red-200 bg-red-50" : ""}`}
-          >
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="space-y-2 flex-1">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <Package className="h-5 w-5 text-muted-foreground" />
-                      <span className="font-semibold">
-                        Item ID: {booking.itemId}
-                      </span>
-                    </div>
-                    <Badge className={getStatusColor(booking.status)}>
-                      <div className="flex items-center gap-1">
-                        {getStatusIcon(booking.status)}
-                        {booking.status.toUpperCase()}
-                      </div>
-                    </Badge>
-                    {isOverdue(booking) && (
-                      <Badge variant="destructive">
-                        <AlertTriangle className="h-3 w-3 mr-1" />
-                        OVERDUE
-                      </Badge>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">Start Date:</span>
-                      <div className="font-medium">
-                        {booking.startTime
-                          ? format(booking.startTime, "MMM dd, yyyy")
-                          : "N/A"}
-                      </div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">End Date:</span>
-                      <div className="font-medium">
-                        {booking.endTime
-                          ? format(booking.endTime, "MMM dd, yyyy")
-                          : "N/A"}
-                      </div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Requested:</span>
-                      <div className="font-medium">
-                        {booking.createdAt
-                          ? format(booking.createdAt, "MMM dd, yyyy")
-                          : "N/A"}
-                      </div>
-                    </div>
-                  </div>
-
-                  {booking.note && (
-                    <div className="mt-3">
-                      <span className="text-muted-foreground text-sm">
-                        Purpose:
-                      </span>
-                      <p className="text-sm mt-1 p-2 bg-muted rounded">
-                        {booking.note}
-                      </p>
-                    </div>
-                  )}
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total</CardTitle>
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.total}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Pending</CardTitle>
+                <Clock className="h-4 w-4 text-yellow-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-yellow-600">
+                  {stats.pending}
                 </div>
-
-                <div className="ml-4">
-                  {booking.status === "approved" && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={async () => {
-                        try {
-                          await updateBooking(booking.id, {
-                            booking: {
-                              itemId: booking.itemId,
-                              startTime: booking.startTime!,
-                              endTime: booking.endTime!,
-                              note: booking.note,
-                              status: "returned",
-                            },
-                            user: user,
-                            bookingId: "",
-                          });
-                          toast.success("Item marked as returned");
-                          loadBookings();
-                        } catch (error) {
-                          toast.error("Failed to update booking status");
-                          console.error(error);
-                        }
-                      }}
-                    >
-                      Mark as Returned
-                    </Button>
-                  )}
-                  {booking.status === "pending" && (
-                    <Button variant="outline" size="sm">
-                      Cancel Request
-                    </Button>
-                  )}
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Active</CardTitle>
+                <CheckCircle className="h-4 w-4 text-green-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-600">
+                  {stats.approved}
                 </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Returned</CardTitle>
+                <Package className="h-4 w-4 text-blue-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-blue-600">
+                  {stats.returned}
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Overdue</CardTitle>
+                <AlertTriangle className="h-4 w-4 text-red-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-red-600">
+                  {stats.overdue}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Filters */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-48">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Bookings</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="approved">Approved</SelectItem>
+                    <SelectItem value="rejected">Rejected</SelectItem>
+                    <SelectItem value="returned">Returned</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
 
-      {filteredBookings.length === 0 && (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No bookings found</h3>
-            <p className="text-muted-foreground mb-4">
-              {statusFilter !== "all"
-                ? `No ${statusFilter} bookings found`
-                : "You haven't made any bookings yet"}
-            </p>
-            {statusFilter === "all" && (
-              <Button onClick={() => (window.location.href = "/browse")}>
-                <Package className="h-4 w-4 mr-2" />
-                Browse Items
-              </Button>
-            )}
-          </CardContent>
-        </Card>
+          {/* Bookings List */}
+          <div className="space-y-4">
+            {filteredBookings.map((booking) => (
+              <Card
+                key={booking.id}
+                className={`${isOverdue(booking) ? "border-red-200" : ""}`}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-2 flex-1">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
+                          <Package className="h-5 w-5 text-muted-foreground" />
+                          <span className="font-semibold">
+                            Item ID: {booking.itemId}
+                          </span>
+                          <span className="font-semibold">
+                            Item Name: {booking.itemName}
+                          </span>
+                        </div>
+                        <Badge className={getStatusColor(booking.status)}>
+                          <div className="flex items-center gap-1">
+                            {getStatusIcon(booking.status)}
+                            {booking.status.toUpperCase()}
+                          </div>
+                        </Badge>
+                        {isOverdue(booking) && (
+                          <Badge variant="destructive">
+                            <AlertTriangle className="h-3 w-3 mr-1" />
+                            OVERDUE
+                          </Badge>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">
+                            Start Date:
+                          </span>
+                          <div className="font-medium">
+                            {booking.startTime
+                              ? format(booking.startTime, "MMM dd, yyyy")
+                              : "N/A"}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">
+                            End Date:
+                          </span>
+                          <div className="font-medium">
+                            {booking.endTime
+                              ? format(booking.endTime, "MMM dd, yyyy")
+                              : "N/A"}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">
+                            Requested:
+                          </span>
+                          <div className="font-medium">
+                            {booking.createdAt
+                              ? format(booking.createdAt, "MMM dd, yyyy")
+                              : "N/A"}
+                          </div>
+                        </div>
+                      </div>
+
+                      {booking.note && (
+                        <div className="mt-3">
+                          <span className="text-muted-foreground text-sm">
+                            Purpose:
+                          </span>
+                          <p className="text-sm mt-1 p-2 bg-muted rounded">
+                            {booking.note}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="ml-4">
+                      {booking.status === "approved" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={async () => {
+                            try {
+                              await updateBooking(booking.id, {
+                                booking: {
+                                  itemId: booking.itemId,
+                                  startTime: booking.startTime!,
+                                  endTime: booking.endTime!,
+                                  note: booking.note,
+                                  status: "returned",
+                                },
+                                user: user,
+                                bookingId: "",
+                              });
+                              toast.success("Item marked as returned");
+                              loadBookings();
+
+                              // Feature 5b: Send notification to admin when item is returned
+                              await sendNotification({
+                                userId: "admin", // You might want to get actual admin user IDs
+                                title: "Item Returned",
+                                message: `Item ${booking.itemId} has been returned by ${user.email}`,
+                                type: "item_returned",
+                              });
+                            } catch (error) {
+                              toast.error("Failed to update booking status");
+                              console.error(error);
+                            }
+                          }}
+                        >
+                          Mark as Returned
+                        </Button>
+                      )}
+                      {booking.status === "pending" && (
+                        <Button variant="outline" size="sm">
+                          Cancel Request
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {filteredBookings.length === 0 && (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">
+                  No bookings found
+                </h3>
+                <p className="text-muted-foreground mb-4">
+                  {statusFilter !== "all"
+                    ? `No ${statusFilter} bookings found`
+                    : "You haven't made any bookings yet"}
+                </p>
+                {statusFilter === "all" && (
+                  <Button onClick={() => (window.location.href = "/browse")}>
+                    <Package className="h-4 w-4 mr-2" />
+                    Browse Items
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </>
       )}
     </div>
   );

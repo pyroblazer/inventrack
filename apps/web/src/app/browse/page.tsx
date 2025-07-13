@@ -24,6 +24,7 @@ import {
 } from "@shared/ui/components/ui/select";
 
 export default function BrowsePage() {
+  // Feature 3a: View available items by category (Staff)
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [filteredItems, setFilteredItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,7 +47,7 @@ export default function BrowsePage() {
       setLoading(true);
       const data = await getAllInventoryItems();
       console.log("data browse page", data);
-      // Only show available items to staff
+      // Feature 3a: Only show available items to staff
       setItems(data.filter((item) => item.isAvailable && item.quantity > 0));
     } catch (error) {
       toast.error("Failed to load items");
@@ -56,6 +57,7 @@ export default function BrowsePage() {
     }
   };
 
+  // Feature 3a: View available items by category - Filtering
   const filterItems = () => {
     let filtered = items;
 
@@ -78,6 +80,7 @@ export default function BrowsePage() {
     setFilteredItems(filtered);
   };
 
+  // Feature 3b: Book item for specific dates
   const handleBookItem = (item: InventoryItem) => {
     setSelectedItem(item);
     setIsBookingModalOpen(true);
@@ -88,6 +91,7 @@ export default function BrowsePage() {
     setSelectedItem(null);
   };
 
+  // Feature 2b: Item details - condition display
   const getConditionColor = (condition?: string) => {
     switch (condition?.toLowerCase()) {
       case "new":
@@ -115,6 +119,7 @@ export default function BrowsePage() {
 
   return (
     <div className="space-y-6 p-6">
+      {/* Feature 3a: View available items - Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Browse Equipment</h1>
@@ -122,7 +127,7 @@ export default function BrowsePage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Feature 3a: View available items - Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -161,7 +166,7 @@ export default function BrowsePage() {
         </Card>
       </div>
 
-      {/* Filters */}
+      {/* Feature 3a: View available items by category - Filters */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-4">
@@ -204,7 +209,7 @@ export default function BrowsePage() {
         </CardContent>
       </Card>
 
-      {/* Items Grid */}
+      {/* Feature 3a: View available items - Items Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredItems.map((item) => (
           <Card
@@ -212,6 +217,7 @@ export default function BrowsePage() {
             className="overflow-hidden hover:shadow-lg transition-shadow"
           >
             <div className="aspect-square bg-muted relative">
+              {/* Feature 2b: Item details - photo display */}
               {item.photoUrl ? (
                 <img
                   src={item.photoUrl || "/placeholder.svg"}
@@ -232,6 +238,7 @@ export default function BrowsePage() {
             <CardContent className="p-4">
               <div className="space-y-3">
                 <div>
+                  {/* Feature 2b: Item details - name, category */}
                   <h3 className="font-semibold text-lg">{item.name}</h3>
                   {item.category && (
                     <p className="text-sm text-muted-foreground">
@@ -243,8 +250,10 @@ export default function BrowsePage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Package className="h-4 w-4 text-muted-foreground" />
+                    {/* Feature 2b: Item details - quantity */}
                     <span className="text-sm">Qty: {item.quantity}</span>
                   </div>
+                  {/* Feature 2b: Item details - condition */}
                   {item.condition && (
                     <Badge className={getConditionColor(item.condition)}>
                       {item.condition}
@@ -252,6 +261,7 @@ export default function BrowsePage() {
                   )}
                 </div>
 
+                {/* Feature 3b: Book item for specific dates */}
                 <Button onClick={() => handleBookItem(item)} className="w-full">
                   <Calendar className="h-4 w-4 mr-2" />
                   Book Item
@@ -278,7 +288,7 @@ export default function BrowsePage() {
         </Card>
       )}
 
-      {/* Booking Modal */}
+      {/* Feature 3b: Book item for specific dates - Booking Modal */}
       <BookingModal
         isOpen={isBookingModalOpen}
         onClose={handleBookingClose}

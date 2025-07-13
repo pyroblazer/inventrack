@@ -30,6 +30,10 @@ message Booking {
   string status = 7; // e.g., Pending, Approved, Cancelled
   google.protobuf.Timestamp createdAt = 8;
   google.protobuf.Timestamp updatedAt = 9;
+  // Added fields for display names
+  string itemName = 10;
+  string userName = 11;
+  string userEmail = 12;
 }
 
 message GetBookingsRequest {
